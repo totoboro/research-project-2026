@@ -1,0 +1,7 @@
+dd>=0.6.0
+
+[notebooks]
+jupyterlab>=4
+matplotlib>=3.8
+networkx>=3.2
+pandas>=2.1

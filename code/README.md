@@ -1,0 +1,87 @@
+# Parity games and decision diagrams
+
+A small research workspace for hand-checkable parity games, exhaustive positional strategy profiles, PGSolver-format inputs, and experiments with the [`dd`](https://github.com/tulip-control/dd) library.
+
+## Setup
+
+Python 3.11 or newer is required. From this directory:
+
+```sh
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[notebooks]'
+jupyter lab
+```
+
+Open `notebooks/01_small_parity_games.ipynb`. The core dependency is `dd`; use `parity_bdd_lab.new_bdd()` for a BDD manager and `new_mdd({...})` for `dd.mdd.MDD`. The BDD backend defaults to `auto`: it selects `dd.cudd.BDD` when the optional Cython/CUDD extension is installed, otherwise it uses `dd.autoref.BDD`. Set `PARITY_BDD_BACKEND=python` or `PARITY_BDD_BACKEND=cudd` to select a backend explicitly.
+
+To build the optional CUDD backend in the active venv, follow the [`dd` installation instructions](https://github.com/tulip-control/dd#cython-bindings). On macOS, use:
+
+```sh
+python -m pip install --upgrade wheel cython
+DD_FETCH=1 DD_CUDD=1 python -m pip install dd -vvv --use-pep517 --no-build-isolation
+python -c 'import dd.cudd'
+```
+
+This builds CUDD and the Cython extension from source and requires a C compiler. Set `PARITY_BDD_BACKEND=cudd` before starting Python/Jupyter; `auto` selects it when available.
+
+## Strategy enumeration
+
+`enumerate_strategy_profiles(game)` enumerates all complete positional strategies for both players. For a profile and starting vertex, play is deterministic, eventually reaches a cycle, and the winner is the parity of the greatest priority on that cycle (max-parity convention). The number of profiles is the product of all out-degrees, so enumeration has a default 10,000-profile guard; raise it explicitly only when appropriate. This reports the winner for each fixed profile and start vertex; it is not a substitute for solving the game against all opponent strategies.
+
+The `.pg` reader/writer supports the common PGSolver text format. The implementation assumes max-parity, as used by the cited benchmark suite.
+
+## Game sources
+
+- `data/games/` contains tiny hand-readable examples included here.
+- [PGSolver](https://github.com/tcsprojects/pgsolver) provides generators for parity games, including recursive ladders and Friedmann strategy-improvement families.
+- [Parity Game Generator benchmark suite](https://github.com/jkeiren/paritygame-generator) links to a broad benchmark collection (random, hard, model-checking, equivalence-checking, and modal-logic instances); its README points to the downloadable archives and documents their max-parity convention.
+
+For reproducibility, record the source, generator/version, parameters, and any transformations when adding external benchmark files under `data/benchmarks/`. Keep large benchmark archives out of version control unless needed.
+
+## Visualize `.pg` files
+
+The optional plotting dependencies are included in the `notebooks` extra. In a notebook, call `draw_pg("data/games/example.pg")` or load a `ParityGame` and call `draw_game(game)`. From the `code` directory, save a standalone PNG with:
+
+```sh
+python scripts/plot_pg.py data/games/image_example.pg
+```
+
+The renderer colors and shapes nodes by owner and labels each node with its ID and priority. It uses a repeatable spring layout by default; pass a `positions` mapping to `draw_game` for a fixed layout.
+
+`ParityGame` supports string vertex labels as well as integer labels. Since PGSolver `.pg` files require integer IDs, map them to readable labels when loading, for example:
+
+```python
+labels = dict(enumerate("abcdefghi"))
+game = read_pg("data/games/image_example.pg", vertex_labels=labels)
+```
+
+For a tidy, fixed graph layout, pass a `{vertex: (x, y)}` mapping to `draw_game`. Automatic `layout="spring"`, `"circular"`, `"shell"`, and `"kamada_kawai"` layouts are also available.
+
+## Symbolic FPJ solver
+
+The `parity_bdd_lab.fpj.fpj(game)` function implements the symbolic FPJ fixpoint algorithm using the selected `dd` BDD backend for vertex sets and the edge relation. It returns an `FPJResult` with Even/Odd winning regions, winning strategy edges, justification edges, iteration count, and live BDD node count. The encoding groups successor sets by source, constructs vertex sets from shared bit prefixes, and periodically asks `dd` to collect unreachable intermediate nodes; this matters on large sparse games such as `ltl2dba08`. DFI uses the same encoding and collection policy. See `notebooks/fpj.ipynb` for runs on the included examples. The implementation follows Algorithm 2 in [Lijzenga and van Dijk, *Symbolic Parity Game Solvers that Yield Winning Strategies*](https://ris.utwente.nl/ws/portalfiles/portal/253278668/Lijzenga2020symbolic.pdf).
+
+## Paper benchmark datasets
+
+The paper's seven SYNTCOMP 2020 pgame benchmark sets are preserved in their original `.oink` files under `data/benchmarks/syntcomp2020-pgame/`. See that folder's README and `manifest.json` for the exact upstream revision, per-file checksums, and set membership. The `.oink` files use the same PGSolver text syntax as `.pg`; load either extension with `read_pg()` or load a full group with `load_benchmark_dataset("Lily")`. No file conversion is needed.
+
+## Benchmarking solvers
+
+`parity_bdd_lab.benchmark` provides `benchmark_game(game, ...)`, `benchmark_dataset(name, ...)`, `benchmark_all_datasets(...)`, and `benchmark_selection(datasets, methods=...)`. The selection runner accepts one dataset, a list of datasets, or `None` for all seven, plus a subset of built-in methods. All dataset runners use four worker processes by default (`workers=4`); `workers=1` selects sequential execution. More workers can improve throughput while increasing peak memory. Built-in methods are symbolic `DFI`, `DFI-ns`, and `FPJ`, explicit `Zielonka`, and `Chain-MS`. Each record includes runtime, winning-region sizes, and a solution fingerprint; symbolic solvers also report diagram nodes. Python allocation tracing is optional and off by default because it can affect timing. Dataset runners report each completed solver run by default; progress callbacks are called in completion order, while returned records retain dataset order. Pass `progress=False` to silence updates or a callback to receive `BenchmarkProgress` events. Parallel custom solver functions must be picklable (normally, define them at module top level). Solver results and loaded games are released between runs, with cyclic garbage collected, so only compact result records accumulate. Use `records_to_dataframe()` for analysis or `write_benchmark_csv()` to save results.
+
+## Forced-winning multistrategies
+
+`chain_multistrategy(game)` is independent of FPJ: it contracts deterministic 1-in/1-out corridors into priority-carrying chains, solves the resulting explicit chain quotient with its own attractor recursion, and constructs a justification graph from winning cycle SCCs and their condensation DAG. It also builds BDD relations over chain IDs for the full graph and each player's retained multistrategy. The retained moves are forced-winning, though this construction is conservative and does not guarantee a globally inclusion-maximal multistrategy. It avoids passing an FPJ result or building FPJ's symbolic fixpoint; parity-game solving still has no known linear worst-case algorithm, so the benchmark results show practical performance rather than a better worst-case bound. Benchmark with the selection controls near the end of `notebooks/benchmark_lily.ipynb`.
+
+`notebooks/benchmark_lily.ipynb` benchmarks both built-in methods on all 23 Lily games and checks that their winning partitions agree.
+
+## Flamegraph profiling
+
+Run `python scripts/profile_parity_games.py --game data/benchmarks/syntcomp2020-pgame/lilydemo03.tlsf.ehoa.oink` or `python scripts/profile_parity_games.py --game ltl2dba08` to profile selected games. Use `--dataset AMBA` to profile every game in a benchmark set. The default profiles all four methods sequentially and writes a standalone SVG flamegraph, raw `.prof` file, cumulative/self-time text report, and JSON summary for each game/method pair under `profiles/`. Open each SVG in a browser; the raw profiles can also be loaded with Python's `pstats` tools. Add `--memory` to record peak traced Python allocation for each run. This flag adds overhead and does not measure native allocations or produce a memory flamegraph.
+
+## Cycle analysis
+
+`enumerate_unique_cycles(game)` lists all directed simple cycles once up to rotation. It enumerates graph cycles directly with Johnson's algorithm, so it avoids expanding the product of positional strategy choices. Each result includes its vertices, priorities, greatest recurring priority, and winner. This is useful when many strategy profiles produce the same cycle; the number of cycles can still grow exponentially with graph size.
+
+`enumerate_forced_winning_cycles(game)` checks which listed cycles are compatible with a player guaranteeing a win: it fixes that player's moves along the cycle and solves the resulting game with Zielonka. The `fpj.ipynb` notebook uses both utilities on the selected `SYNTCOMP_GAME` benchmark, with the selected game stored as `game`.

@@ -1,0 +1,3 @@
+Tiny games for notebook examples live in `parity_bdd_lab.examples.tiny_games()` and are also provided as `.pg` files where useful. The `.pg` format and max-parity convention are described in the code folder README.
+
+`image_example.pg` is the transcription of the supplied nine-vertex diagram. Vertex IDs map `a` through `i` to `0` through `8`. The diagram has no ownership legend, so circles are assigned to player 0 and pentagons to player 1 as a stated working assumption in the file comments. Change the owner field if your source uses the reverse convention. The notebook enumerates all 64 positional profiles for this game as well as the tiny examples.

@@ -1,0 +1,43 @@
+Metadata-Version: 2.4
+Name: parity-bdd-lab
+Version: 0.1.0
+Summary: Small parity games, exhaustive positional strategies, and BDD/MDD experiments
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: dd>=0.6.0
+Provides-Extra: notebooks
+Requires-Dist: jupyterlab>=4; extra == "notebooks"
+Requires-Dist: matplotlib>=3.8; extra == "notebooks"
+Requires-Dist: networkx>=3.2; extra == "notebooks"
+Requires-Dist: pandas>=2.1; extra == "notebooks"
+
+# Parity games and decision diagrams
+
+A small research workspace for hand-checkable parity games, exhaustive positional strategy profiles, PGSolver-format inputs, and experiments with the [`dd`](https://github.com/tulip-control/dd) library.
+
+## Setup
+
+Python 3.11 or newer is required. From this directory:
+
+```sh
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[notebooks]'
+jupyter lab
+```
+
+Open `notebooks/01_small_parity_games.ipynb`. The core dependency is `dd`; use `parity_bdd_lab.new_bdd()` for the `dd.autoref.BDD` interface and `new_mdd({...})` for `dd.mdd.MDD`. `dd.mdd` is the MDD manager provided by `dd`, while `dd.autoref` is the higher-level BDD interface.
+
+## Strategy enumeration
+
+`enumerate_strategy_profiles(game)` enumerates all complete positional strategies for both players. For a profile and starting vertex, play is deterministic, eventually reaches a cycle, and the winner is the parity of the greatest priority on that cycle (max-parity convention). The number of profiles is the product of all out-degrees, so enumeration has a default 10,000-profile guard; raise it explicitly only when appropriate. This reports the winner for each fixed profile and start vertex; it is not a substitute for solving the game against all opponent strategies.
+
+The `.pg` reader/writer supports the common PGSolver text format. The implementation assumes max-parity, as used by the cited benchmark suite.
+
+## Game sources
+
+- `data/games/` contains tiny hand-readable examples included here.
+- [PGSolver](https://github.com/tcsprojects/pgsolver) provides generators for parity games, including recursive ladders and Friedmann strategy-improvement families.
+- [Parity Game Generator benchmark suite](https://github.com/jkeiren/paritygame-generator) links to a broad benchmark collection (random, hard, model-checking, equivalence-checking, and modal-logic instances); its README points to the downloadable archives and documents their max-parity convention.
+
+For reproducibility, record the source, generator/version, parameters, and any transformations when adding external benchmark files under `data/benchmarks/`. Keep large benchmark archives out of version control unless needed.

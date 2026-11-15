@@ -1,0 +1,15 @@
+# Transcribed from the user-provided diagram.
+# Vertex IDs: a=0, b=1, c=2, d=3, e=4, f=5, g=6, h=7, i=8.
+# Priorities are the numbers shown in the vertices.
+# Ownership: circles (a,c,e,f,g,h,i) are player 0; pentagons (b,d) are player 1.
+# Max-parity convention.
+parity 9;
+0 0 0 1;
+1 2 1 0,5;
+2 7 0 1,6;
+3 1 1 4,2;
+4 5 0 8,3;
+5 8 0 6;
+6 6 0 7;
+7 2 0 8,3;
+8 3 0 7,4;
