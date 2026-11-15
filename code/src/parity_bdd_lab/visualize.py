@@ -16,7 +16,7 @@ def draw_game(
     *,
     positions: Mapping[object, tuple[float, float]] | None = None,
     vertex_names: Mapping[object, str] | None = None,
-    layout: str = "spring",
+    layout: str = "graphviz",
     ax: "Axes | None" = None,
     title: str | None = None,
     show: bool = True,
@@ -25,8 +25,10 @@ def draw_game(
 
     Player 0 vertices are blue circles; player 1 vertices are orange pentagons.
     Each vertex is labelled with its name/ID and priority. Returns ``(fig, ax)``.
-    Provide ``positions`` for exact control, or choose ``spring``, ``circular``,
-    ``shell``, or ``kamada_kawai`` for a deterministic automatic layout.
+    Provide ``positions`` for exact control, or choose ``graphviz`` (the
+    default), ``spring``, ``circular``, ``shell``, or ``kamada_kawai`` for a
+    deterministic automatic layout. One-way edges are straight; reciprocal
+    edges are curved away from one another so both directions remain visible.
     """
     try:
         import matplotlib.pyplot as plt
@@ -44,7 +46,43 @@ def draw_game(
             graph.add_edge(source, target)
 
     if positions is None:
+        def graphviz_layout():
+            # Relabel before passing the graph to pydot: distinct Python
+            # objects can have identical string representations, which
+            # Graphviz would otherwise collapse into one node.
+            layout_graph = nx.convert_node_labels_to_integers(
+                graph, label_attribute="vertex"
+            )
+            layout_graph.graph["graph"] = {
+                "nodesep": "0.8",
+                "ranksep": "1.0",
+                "overlap": "false",
+            }
+            layout_graph.graph["node"] = {
+                "fixedsize": "true",
+                "height": "0.75",
+                "shape": "circle",
+                "width": "0.75",
+            }
+            try:
+                layout_positions = nx.nx_pydot.pydot_layout(
+                    layout_graph, prog="dot"
+                )
+            except Exception as exc:
+                raise RuntimeError(
+                    "the graphviz layout requires the `pydot` Python package "
+                    "and a working Graphviz `dot` executable; install the "
+                    "project's `notebooks` extra and Graphviz"
+                ) from exc
+            if layout_positions is None or set(layout_positions) != set(layout_graph):
+                raise RuntimeError("Graphviz did not return a position for every vertex")
+            return {
+                data["vertex"]: layout_positions[node]
+                for node, data in layout_graph.nodes(data=True)
+            }
+
         layouts = {
+            "graphviz": graphviz_layout,
             "spring": lambda: nx.spring_layout(graph, seed=7, k=1.4),
             "circular": lambda: nx.circular_layout(graph),
             "shell": lambda: nx.shell_layout(graph),
@@ -59,13 +97,19 @@ def draw_game(
             raise ValueError(f"positions are missing vertices: {sorted(missing)}")
         pos = positions
 
+    vertex_count = len(game.vertices)
     if ax is None:
-        fig, ax = plt.subplots(figsize=(9, 6), constrained_layout=True)
+        figure_scale = min(1.75, max(1.0, (vertex_count / 16) ** 0.5))
+        fig, ax = plt.subplots(
+            figsize=(9 * figure_scale, 6 * figure_scale), constrained_layout=True
+        )
     else:
         fig = ax.figure
 
     node_colors = {0: "#4C78A8", 1: "#F2A541"}
     node_shapes = {0: "o", 1: "p"}
+    node_size = min(1500, max(300, 4500 / vertex_count**0.5))
+    font_size = min(11, max(7, 15 - vertex_count**0.5))
     labels = {
         v: f"{(vertex_names or {}).get(v, str(v))}\n{game.priority[v]}"
         for v in game.vertices
@@ -76,17 +120,58 @@ def draw_game(
         if nodes:
             nx.draw_networkx_nodes(
                 graph, pos, nodelist=nodes, node_shape=node_shapes[owner],
-                node_color=node_colors[owner], node_size=1500,
+                node_color=node_colors[owner], node_size=node_size,
                 edgecolors="#222222", linewidths=1.2, ax=ax,
             )
     nx.draw_networkx_labels(
-        graph, pos, labels=labels, font_size=11, font_weight="bold", ax=ax
+        graph, pos, labels=labels, font_size=font_size, font_weight="bold", ax=ax
     )
-    nx.draw_networkx_edges(
-        graph, pos, arrows=True, arrowstyle="-|>", arrowsize=18,
-        width=1.5, edge_color="#333333", connectionstyle="arc3,rad=0.08",
-        min_source_margin=18, min_target_margin=20, ax=ax,
+    self_loops = []
+    reciprocal_edges = []
+    one_way_edges = []
+    for source, target in graph.edges:
+        if source == target:
+            self_loops.append((source, target))
+        elif graph.has_edge(target, source):
+            reciprocal_edges.append((source, target))
+        else:
+            one_way_edges.append((source, target))
+
+    edge_style = {
+        "arrows": True,
+        "arrowstyle": "-|>",
+        "arrowsize": 18,
+        "width": 1.5,
+        "edge_color": "#333333",
+        "min_source_margin": 18,
+        "min_target_margin": 20,
+        "node_size": node_size,
+        "ax": ax,
+    }
+    # NetworkX sizes self-loops from the vertical span of the edgelist in a
+    # draw call. Include them with a non-loop group when possible so loops do
+    # not collapse behind their nodes in a larger layout. NetworkX still uses
+    # its dedicated self-loop path, regardless of that group's arc style.
+    straight_edges = one_way_edges + (self_loops if one_way_edges else [])
+    curved_edges = reciprocal_edges + (
+        self_loops if not one_way_edges and reciprocal_edges else []
     )
+    loops_only = self_loops if not one_way_edges and not reciprocal_edges else []
+    if straight_edges:
+        nx.draw_networkx_edges(
+            graph, pos, edgelist=straight_edges,
+            connectionstyle="arc3,rad=0.0", **edge_style,
+        )
+    if curved_edges:
+        nx.draw_networkx_edges(
+            graph, pos, edgelist=curved_edges,
+            connectionstyle="arc3,rad=0.12", **edge_style,
+        )
+    if loops_only:
+        nx.draw_networkx_edges(
+            graph, pos, edgelist=loops_only,
+            connectionstyle="arc3,rad=0.35", **edge_style,
+        )
     ax.set_title(title or game.name)
     ax.margins(0.18)
     ax.set_axis_off()

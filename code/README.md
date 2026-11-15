@@ -9,7 +9,7 @@ Python 3.11 or newer is required. From this directory:
 ```sh
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -e '.[notebooks]'
+python -m pip install -e '.[notebooks,test]'
 jupyter lab
 ```
 
@@ -41,13 +41,13 @@ For reproducibility, record the source, generator/version, parameters, and any t
 
 ## Visualize `.pg` files
 
-The optional plotting dependencies are included in the `notebooks` extra. In a notebook, call `draw_pg("data/games/example.pg")` or load a `ParityGame` and call `draw_game(game)`. From the `code` directory, save a standalone PNG with:
+The optional plotting dependencies are included in the `notebooks` extra. The default automatic layout also requires the [Graphviz](https://graphviz.org/download/) `dot` executable (for example, `brew install graphviz` on macOS or `apt install graphviz` on Debian/Ubuntu). In a notebook, call `draw_pg("data/games/example.pg")` or load a `ParityGame` and call `draw_game(game)`. From the `code` directory, save a standalone PNG with:
 
 ```sh
 python scripts/plot_pg.py data/games/image_example.pg
 ```
 
-The renderer colors and shapes nodes by owner and labels each node with its ID and priority. It uses a repeatable spring layout by default; pass a `positions` mapping to `draw_game` for a fixed layout.
+The renderer colors and shapes nodes by owner and labels each node with its ID and priority. It uses a repeatable, layered Graphviz layout by default. One-way edges are straight, while the two directions of a reciprocal edge are drawn as separate curves. Pass a `positions` mapping to `draw_game` for a fixed layout.
 
 `ParityGame` supports string vertex labels as well as integer labels. Since PGSolver `.pg` files require integer IDs, map them to readable labels when loading, for example:
 
@@ -56,7 +56,7 @@ labels = dict(enumerate("abcdefghi"))
 game = read_pg("data/games/image_example.pg", vertex_labels=labels)
 ```
 
-For a tidy, fixed graph layout, pass a `{vertex: (x, y)}` mapping to `draw_game`. Automatic `layout="spring"`, `"circular"`, `"shell"`, and `"kamada_kawai"` layouts are also available.
+For a tidy, fixed graph layout, pass a `{vertex: (x, y)}` mapping to `draw_game`. Automatic `layout="graphviz"`, `"spring"`, `"circular"`, `"shell"`, and `"kamada_kawai"` layouts are available; `"graphviz"` is the default.
 
 ## Symbolic FPJ solver
 
@@ -75,6 +75,22 @@ The paper's seven SYNTCOMP 2020 pgame benchmark sets are preserved in their orig
 `chain_multistrategy(game)` is independent of FPJ: it contracts deterministic 1-in/1-out corridors into priority-carrying chains, solves the resulting explicit chain quotient with its own attractor recursion, and constructs a justification graph from winning cycle SCCs and their condensation DAG. It also builds BDD relations over chain IDs for the full graph and each player's retained multistrategy. The retained moves are forced-winning, though this construction is conservative and does not guarantee a globally inclusion-maximal multistrategy. It avoids passing an FPJ result or building FPJ's symbolic fixpoint; parity-game solving still has no known linear worst-case algorithm, so the benchmark results show practical performance rather than a better worst-case bound. Benchmark with the selection controls near the end of `notebooks/benchmark_lily.ipynb`.
 
 `notebooks/benchmark_lily.ipynb` benchmarks both built-in methods on all 23 Lily games and checks that their winning partitions agree.
+
+## Validate multistrategies
+
+`validate_multistrategy(game, result)` independently checks a returned
+multistrategy against Zielonka's winning regions. It verifies that every
+controlled winning vertex has legal allowed moves and, more importantly, that
+every possible resolution of those moves wins. A failure includes a concrete
+ultimately periodic losing play. By default the validator also checks exact
+inclusion-maximality by trying every omitted legal in-region edge; this can be
+expensive on large games, so pass `check_maximality=False` when only validity
+and correctness are needed.
+
+Open `notebooks/validate_multistrategy.ipynb` for a detailed report with
+per-player quality metrics, per-vertex choices, counterexamples, and FPJ and
+Zielonka comparisons. Change `GAME_PATH` in the configuration cell to inspect
+any included `.pg` or `.oink` game.
 
 ## Flamegraph profiling
 

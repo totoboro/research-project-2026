@@ -11,7 +11,8 @@ requires-python = ">=3.11"
 dependencies = ["dd>=0.6.0"]
 
 [project.optional-dependencies]
-notebooks = ["jupyterlab>=4", "matplotlib>=3.8", "networkx>=3.2", "pandas>=2.1"]
+notebooks = ["jupyterlab>=4", "matplotlib>=3.8", "networkx>=3.2", "pandas>=2.1", "pydot>=3"]
+test = ["pytest>=8", "nbclient>=0.10"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

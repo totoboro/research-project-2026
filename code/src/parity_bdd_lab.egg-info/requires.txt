@@ -5,3 +5,8 @@ jupyterlab>=4
 matplotlib>=3.8
 networkx>=3.2
 pandas>=2.1
+pydot>=3
+
+[test]
+pytest>=8
+nbclient>=0.10
