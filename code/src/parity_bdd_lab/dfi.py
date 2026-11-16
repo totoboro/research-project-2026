@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Hashable
 
 from .decision_diagrams import collect_bdd_garbage
-from .fpj import _BDD_SOLVER_GC_INTERVAL, _Encoding
+from .fpjm import _BDD_SOLVER_GC_INTERVAL, _Encoding
 from .game import ParityGame
 
 Vertex = Hashable

@@ -1,4 +1,4 @@
-"""Symbolic FPJ parity-game solver using BDDs from :mod:`dd`.
+"""Symbolic FPJM parity-game solver using BDDs from :mod:`dd`.
 
 The implementation follows Algorithm 2 (symbolic FPJ) from Lijzenga and
 van Dijk, *Symbolic Parity Game Solvers that Yield Winning Strategies*.
@@ -21,8 +21,8 @@ _BDD_SOLVER_GC_INTERVAL = 8
 
 
 @dataclass(frozen=True)
-class FPJResult:
-    """Winning regions and symbolic justification strategies returned by FPJ."""
+class FPJMResult:
+    """Winning regions and symbolic justification multi-strategies returned by FPJM."""
 
     even_wins: frozenset[Vertex]
     odd_wins: frozenset[Vertex]
@@ -162,8 +162,8 @@ class _Encoding:
                    if assignment.get(variable, False))
 
 
-def fpj(game: ParityGame, *, max_iterations: int = 1_000_000) -> FPJResult:
-    """Solve ``game`` using the symbolic Fixpoint Iteration with Justifications.
+def fpjm(game: ParityGame, *, max_iterations: int = 1_000_000) -> FPJMResult:
+    """Solve ``game`` using symbolic FPJM.
 
     Returns the even and odd winning regions plus the justification edges used
     as each player's strategy. Variables are binary-coded vertex IDs in the
@@ -241,7 +241,7 @@ def fpj(game: ParityGame, *, max_iterations: int = 1_000_000) -> FPJResult:
     iterations = 0
     while unjustified != bdd.false:
         if iterations >= max_iterations:
-            raise RuntimeError(f"FPJ did not converge within {max_iterations:,} iterations")
+            raise RuntimeError(f"FPJM did not converge within {max_iterations:,} iterations")
         Z, J = next_step(Z, J, unjustified)
         unjustified = enc.V & ~enc.exists_next(J)
         iterations += 1
@@ -256,7 +256,7 @@ def fpj(game: ParityGame, *, max_iterations: int = 1_000_000) -> FPJResult:
     even_strategy = J & enc.owner[0] & even_wins & enc.prime(even_wins)
     odd_strategy = J & enc.owner[1] & odd_wins & enc.prime(odd_wins)
     collect_bdd_garbage(bdd)
-    return FPJResult(
+    return FPJMResult(
         even_wins=enc.vertices_in(even_wins),
         odd_wins=enc.vertices_in(odd_wins),
         even_strategy=enc.edges_in(even_strategy),

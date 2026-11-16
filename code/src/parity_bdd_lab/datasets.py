@@ -1,4 +1,4 @@
-"""Access and convert the parity-game benchmark files used by symbolic FPJ."""
+"""Access and convert the parity-game benchmark files used by symbolic FPJM."""
 
 from __future__ import annotations
 

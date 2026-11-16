@@ -34,7 +34,7 @@ def main() -> int:
     parser.add_argument(
         "--bdd-backend", choices=("auto", "python", "cudd"),
         default=os.environ.get("PARITY_BDD_BACKEND", "auto"),
-        help="BDD backend for DFI/FPJ (default: auto; use cudd to require native CUDD)",
+        help="BDD backend for DFI/FPJM (default: auto; use cudd to require native CUDD)",
     )
     parser.add_argument(
         "--output", type=Path, default=PROJECT / "profiles",

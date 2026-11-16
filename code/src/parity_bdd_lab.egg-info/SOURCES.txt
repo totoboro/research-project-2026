@@ -7,7 +7,7 @@ src/parity_bdd_lab/datasets.py
 src/parity_bdd_lab/decision_diagrams.py
 src/parity_bdd_lab/dfi.py
 src/parity_bdd_lab/examples.py
-src/parity_bdd_lab/fpj.py
+src/parity_bdd_lab/fpjm.py
 src/parity_bdd_lab/game.py
 src/parity_bdd_lab/multistrategy.py
 src/parity_bdd_lab/profiling.py

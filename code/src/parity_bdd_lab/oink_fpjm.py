@@ -1,4 +1,4 @@
-"""Python port of Oink's multi-strategy FPJ solver.
+"""Python port of Oink's FPJM solver.
 
 Ported from ``src/solvers/fpjm.cpp`` in trolando/oink (Apache-2.0),
 copyright 2020-2024 Tom van Dijk.
@@ -19,7 +19,7 @@ from .game import ParityGame
 
 
 def oink_fpjm(game: ParityGame, *, max_iterations: int = 1_000_000) -> OinkResult:
-    """Solve ``game`` with Oink's multi-strategy FPJ algorithm."""
+    """Solve ``game`` with Oink's FPJM algorithm."""
     check_iteration_limit(max_iterations)
     oink = OinkGame(game)
     block_end = parity_block_ends(oink)

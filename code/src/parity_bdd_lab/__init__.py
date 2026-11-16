@@ -38,7 +38,7 @@ from .cycles import (
 )
 from .decision_diagrams import collect_bdd_garbage, get_bdd_class, new_bdd, new_mdd
 from .dfi import DFIResult, dfi, dfi_ns
-from .fpj import FPJResult, fpj
+from .fpjm import FPJMResult, fpjm
 from ._oink_common import OinkResult
 from .oink_fpi import oink_fpi
 from .oink_fpim import oink_fpim
@@ -70,7 +70,7 @@ from .visualize import draw_game, draw_pg
 from .zielonka import ZielonkaResult, zielonka
 
 __all__ = [
-    "FPJResult",
+    "FPJMResult",
     "OinkResult",
     "ForcedMultiStrategyResult",
     "CycleKernel",
@@ -103,7 +103,7 @@ __all__ = [
     "StrategyProfile",
     "enumerate_strategy_profiles",
     "draw_game",
-    "fpj",
+    "fpjm",
     "oink_fpi",
     "oink_fpim",
     "oink_fpj",

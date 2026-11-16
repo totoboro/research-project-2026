@@ -6,8 +6,10 @@ from pathlib import Path
 import pytest
 
 from parity_bdd_lab import (
+    FPJMResult,
     ParityGame,
     benchmark_game,
+    fpjm,
     oink_fpi,
     oink_fpim,
     oink_fpj,
@@ -96,3 +98,14 @@ def test_oink_solvers_are_available_as_built_in_benchmarks() -> None:
 
     assert tuple(record.method for record in records) == methods
     assert len({record.solution_fingerprint for record in records}) == 1
+
+
+def test_symbolic_fpjm_public_api_and_benchmark_name() -> None:
+    game = ParityGame(owner={0: 0}, priority={0: 0}, successors={0: (0,)})
+
+    result = fpjm(game)
+    records = benchmark_game(game, methods=("FPJM",), workers=1)
+
+    assert isinstance(result, FPJMResult)
+    assert records[0].method == "FPJM"
+    assert records[0].strategy_edges == 1

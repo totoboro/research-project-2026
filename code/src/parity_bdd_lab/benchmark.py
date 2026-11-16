@@ -18,7 +18,7 @@ from typing import Callable, Hashable, Iterable, Mapping
 
 from .datasets import benchmark_dataset_names, iter_benchmark_files
 from .dfi import dfi, dfi_ns
-from .fpj import fpj
+from .fpjm import fpjm
 from .game import ParityGame, read_pg
 from .oink_fpi import oink_fpi
 from .oink_fpim import oink_fpim
@@ -33,7 +33,7 @@ Solver = Callable[[ParityGame], object]
 DEFAULT_METHODS: dict[str, Solver] = {
     "DFI": dfi,
     "DFI-ns": dfi_ns,
-    "FPJ": fpj,
+    "FPJM": fpjm,
     "Oink-FPI": oink_fpi,
     "Oink-FPIM": oink_fpim,
     "Oink-FPJ": oink_fpj,

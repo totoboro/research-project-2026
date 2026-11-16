@@ -618,7 +618,7 @@ def _justify_from_cycles(game, player, region, selected):
 def chain_multistrategy(game: ParityGame) -> ForcedMultiStrategyResult:
     """Solve and justify forced multistrategies using chains and cycle kernels.
 
-    This solver does not call FPJ or Zielonka. It compresses deterministic
+    This solver does not call FPJM or Zielonka. It compresses deterministic
     corridors to priority-carrying chain transitions, solves that quotient with
     an explicit attractor recursion, then constructs its own justification
     graph by propagating backwards from winning cycle kernels. Vertices outside
