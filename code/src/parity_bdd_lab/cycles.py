@@ -3,11 +3,30 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Hashable
+from typing import Hashable, Protocol
 
 from .game import ParityGame
 
 Vertex = Hashable
+Edge = tuple[Vertex, Vertex]
+
+
+class MultiStrategyLike(Protocol):
+    even_wins: frozenset[Vertex]
+    odd_wins: frozenset[Vertex]
+    even_strategy: frozenset[Edge]
+    odd_strategy: frozenset[Edge]
+
+
+class CycleEnumerationLimitError(RuntimeError):
+    """Raised when guarded simple-cycle enumeration exceeds its limit."""
+
+    def __init__(self, limit: int):
+        self.limit = limit
+        super().__init__(
+            f"simple-cycle enumeration exceeded max_cycles={limit:,}; "
+            "raise the limit explicitly if exhaustive output is required"
+        )
 
 
 @dataclass(frozen=True)
@@ -70,7 +89,11 @@ def _canonical_rotation(cycle: tuple[Vertex, ...], order: dict[Vertex, int]) -> 
     return min(rotations, key=lambda rotation: tuple(order[v] for v in rotation))
 
 
-def enumerate_unique_cycles(game: ParityGame) -> tuple[ParityCycle, ...]:
+def enumerate_unique_cycles(
+    game: ParityGame,
+    *,
+    max_cycles: int | None = None,
+) -> tuple[ParityCycle, ...]:
     """Return every unique directed simple cycle in ``game``.
 
     Cycles that differ only by their starting vertex are returned once; reverse
@@ -78,6 +101,8 @@ def enumerate_unique_cycles(game: ParityGame) -> tuple[ParityCycle, ...]:
     cycles directly, avoiding the product of out-degrees used by positional
     strategy-profile enumeration.
     """
+    if max_cycles is not None and max_cycles < 1:
+        raise ValueError("max_cycles must be positive or None")
     vertices = game.vertices
     order = {vertex: index for index, vertex in enumerate(vertices)}
     # Parallel duplicate edges do not make distinct vertex cycles.
@@ -116,6 +141,8 @@ def enumerate_unique_cycles(game: ParityGame) -> tuple[ParityCycle, ...]:
                     continue
                 if target == start:
                     found.add(_canonical_rotation(tuple(path), order))
+                    if max_cycles is not None and len(found) > max_cycles:
+                        raise CycleEnumerationLimitError(max_cycles)
                     found_cycle = True
                 elif target not in blocked and circuit(target):
                     found_cycle = True
@@ -137,6 +164,64 @@ def enumerate_unique_cycles(game: ParityGame) -> tuple[ParityCycle, ...]:
         greatest = max(priorities)
         result.append(ParityCycle(cycle, priorities, greatest, greatest % 2))
     return tuple(result)
+
+
+def multistrategy_subgame(
+    game: ParityGame,
+    result: MultiStrategyLike,
+    player: int,
+) -> ParityGame:
+    """Build the graph of every play permitted by one player's multistrategy.
+
+    At vertices owned by ``player`` only returned strategy edges are retained.
+    At opponent vertices every original in-region edge remains available.
+    """
+    if player not in (0, 1):
+        raise ValueError("player must be 0 or 1")
+    region = result.even_wins if player == 0 else result.odd_wins
+    allowed = result.even_strategy if player == 0 else result.odd_strategy
+    if not region:
+        raise ValueError(f"player {player} has an empty winning region")
+    successors = {}
+    for vertex in region:
+        if game.owner[vertex] == player:
+            targets = tuple(
+                target for target in game.successors[vertex]
+                if target in region and (vertex, target) in allowed
+            )
+        else:
+            targets = tuple(target for target in game.successors[vertex] if target in region)
+        if not targets:
+            raise ValueError(
+                f"multistrategy has no permitted successor at {vertex!r} "
+                f"for player {player}"
+            )
+        successors[vertex] = targets
+    return ParityGame(
+        owner={vertex: game.owner[vertex] for vertex in region},
+        priority={vertex: game.priority[vertex] for vertex in region},
+        successors=successors,
+        name=f"{game.name} [player {player} multistrategy]",
+    )
+
+
+def enumerate_multistrategy_cycles(
+    game: ParityGame,
+    result: MultiStrategyLike,
+    player: int,
+    *,
+    max_cycles: int | None = 10_000,
+) -> tuple[ParityCycle, ...]:
+    """Enumerate all rotation-unique simple cycles permitted by a strategy.
+
+    This is a finite description of possible recurrent behavior, not an
+    enumeration of every infinite play. The latter can be non-periodic when
+    permitted choices vary between repeated visits to the same vertex.
+    """
+    return enumerate_unique_cycles(
+        multistrategy_subgame(game, result, player),
+        max_cycles=max_cycles,
+    )
 
 
 @dataclass(frozen=True)

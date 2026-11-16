@@ -21,6 +21,8 @@ from .dfi import dfi, dfi_ns
 from .fpj import fpj
 from .game import ParityGame, read_pg
 from .multistrategy import chain_multistrategy
+from .cq_multistrategy import chain_quotient_multistrategy
+from .cq_cached_multistrategy import cached_chain_quotient_multistrategy
 from .zielonka import zielonka
 
 Solver = Callable[[ParityGame], object]
@@ -30,6 +32,8 @@ DEFAULT_METHODS: dict[str, Solver] = {
     "FPJ": fpj,
     "Chain-MS": chain_multistrategy,
     "Zielonka": zielonka,
+    "CQ-MS": chain_quotient_multistrategy,
+    "CQ-MS-Cached": cached_chain_quotient_multistrategy,
 }
 
 

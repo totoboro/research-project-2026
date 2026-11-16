@@ -51,6 +51,23 @@ class _ExplicitSolution:
 
 
 @dataclass(frozen=True)
+class ExplicitSolverTraceEvent:
+    """One observable step of the recursive explicit parity-game solver."""
+
+    call_id: int
+    depth: int
+    action: str
+    vertices: tuple[Vertex, ...]
+    player: int | None = None
+    priority: int | None = None
+    target: tuple[Vertex, ...] = ()
+    attracted: tuple[Vertex, ...] = ()
+    even_wins: tuple[Vertex, ...] = ()
+    odd_wins: tuple[Vertex, ...] = ()
+    choices: tuple[Edge, ...] = ()
+
+
+@dataclass(frozen=True)
 class ForcedMultiStrategyResult:
     """Forced-winning move sets, cycle kernels, and symbolic chain relations."""
 
@@ -281,14 +298,36 @@ def _compress_to_chain_game(
     return compressed, chain_state_to_id
 
 
-def _solve_explicit_parity_game(game: ParityGame) -> _ExplicitSolution:
-    """Solve a finite max-parity game using an explicit attractor recursion."""
+def _solve_explicit_parity_game(
+    game: ParityGame,
+    *,
+    trace: list[ExplicitSolverTraceEvent] | None = None,
+) -> _ExplicitSolution:
+    """Solve a finite max-parity game using an explicit attractor recursion.
+
+    When ``trace`` is supplied, append structured events describing every
+    recursive call, attractor, intermediate solution, and return value.  The
+    optional tracing does not change the solver's decisions.
+    """
     predecessors = {v: [] for v in game.vertices}
     for source in game.vertices:
         for target in game.successors[source]:
             predecessors[target].append(source)
 
     solve_calls = 0
+
+    def ordered_edges(choices):
+        return tuple(sorted(choices.items(), key=lambda edge: (str(edge[0]), str(edge[1]))))
+
+    def record(call_id, depth, action, vertices, **details):
+        if trace is not None:
+            trace.append(ExplicitSolverTraceEvent(
+                call_id=call_id,
+                depth=depth,
+                action=action,
+                vertices=_ordered(vertices),
+                **details,
+            ))
 
     def attractor(vertices: frozenset[Vertex], player: int, target: frozenset[Vertex]):
         attracted = set(target)
@@ -318,33 +357,68 @@ def _solve_explicit_parity_game(game: ParityGame) -> _ExplicitSolution:
                         queue.append(source)
         return frozenset(attracted), choices
 
-    def solve(vertices: frozenset[Vertex]):
+    def solve(vertices: frozenset[Vertex], depth: int = 0):
         nonlocal solve_calls
         solve_calls += 1
+        call_id = solve_calls
+        record(call_id, depth, "enter", vertices)
         if not vertices:
+            record(call_id, depth, "return-empty", vertices)
             return frozenset(), frozenset(), {0: {}, 1: {}}
 
         highest = max(game.priority[v] for v in vertices)
         alpha = highest % 2
         beta = 1 - alpha
         top = frozenset(v for v in vertices if game.priority[v] == highest)
+        record(
+            call_id, depth, "select-highest-priority", vertices,
+            player=alpha, priority=highest, target=_ordered(top),
+        )
         attract_alpha, strategy_alpha = attractor(vertices, alpha, top)
-        sub_even, sub_odd, sub_strategy = solve(vertices - attract_alpha)
+        record(
+            call_id, depth, "first-attractor", vertices,
+            player=alpha, priority=highest, target=_ordered(top),
+            attracted=_ordered(attract_alpha), choices=ordered_edges(strategy_alpha),
+        )
+        sub_even, sub_odd, sub_strategy = solve(vertices - attract_alpha, depth + 1)
+        record(
+            call_id, depth, "first-recursion-result", vertices,
+            even_wins=_ordered(sub_even), odd_wins=_ordered(sub_odd),
+        )
         sub_regions = {0: sub_even, 1: sub_odd}
         if not sub_regions[beta]:
             regions = {0: set(sub_even), 1: set(sub_odd)}
             regions[alpha].update(attract_alpha)
             strategies = {0: dict(sub_strategy[0]), 1: dict(sub_strategy[1])}
             strategies[alpha].update(strategy_alpha)
+            record(
+                call_id, depth, "return-after-first-recursion", vertices,
+                even_wins=_ordered(regions[0]), odd_wins=_ordered(regions[1]),
+                choices=ordered_edges(strategies[alpha]),
+            )
             return frozenset(regions[0]), frozenset(regions[1]), strategies
 
         attract_beta, strategy_beta = attractor(vertices, beta, sub_regions[beta])
-        rest_even, rest_odd, rest_strategy = solve(vertices - attract_beta)
+        record(
+            call_id, depth, "second-attractor", vertices,
+            player=beta, target=_ordered(sub_regions[beta]),
+            attracted=_ordered(attract_beta), choices=ordered_edges(strategy_beta),
+        )
+        rest_even, rest_odd, rest_strategy = solve(vertices - attract_beta, depth + 1)
+        record(
+            call_id, depth, "second-recursion-result", vertices,
+            even_wins=_ordered(rest_even), odd_wins=_ordered(rest_odd),
+        )
         regions = {0: set(rest_even), 1: set(rest_odd)}
         regions[beta].update(attract_beta)
         strategies = {0: dict(rest_strategy[0]), 1: dict(rest_strategy[1])}
         strategies[beta].update(sub_strategy[beta])
         strategies[beta].update(strategy_beta)
+        record(
+            call_id, depth, "return-after-second-recursion", vertices,
+            even_wins=_ordered(regions[0]), odd_wins=_ordered(regions[1]),
+            choices=ordered_edges(strategies[beta]),
+        )
         return frozenset(regions[0]), frozenset(regions[1]), strategies
 
     even_wins, odd_wins, choices = solve(frozenset(game.vertices))
@@ -359,7 +433,13 @@ def _solve_explicit_parity_game(game: ParityGame) -> _ExplicitSolution:
             if not winning_successors:
                 raise RuntimeError(f"solver found no winning move for player {player} at {vertex!r}")
             choices[player][vertex] = winning_successors[0]
-    return _ExplicitSolution(even_wins, odd_wins, choices[0], choices[1], solve_calls)
+    result = _ExplicitSolution(even_wins, odd_wins, choices[0], choices[1], solve_calls)
+    record(
+        1, 0, "complete-positional-strategies", frozenset(game.vertices),
+        even_wins=_ordered(even_wins), odd_wins=_ordered(odd_wins),
+        choices=ordered_edges({**choices[0], **choices[1]}),
+    )
+    return result
 
 
 def _expand_solution(game, chains, compressed, chain_state_to_id, solution):

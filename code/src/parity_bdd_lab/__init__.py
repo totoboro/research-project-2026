@@ -27,15 +27,40 @@ from .datasets import (
 )
 from .profiling import ProfileArtifact, profile_dataset, profile_solver
 from .cycles import (
+    CycleEnumerationLimitError,
     ForcedParityCycle,
+    MultiStrategyLike,
     ParityCycle,
     enumerate_forced_winning_cycles,
+    enumerate_multistrategy_cycles,
     enumerate_unique_cycles,
+    multistrategy_subgame,
 )
 from .decision_diagrams import collect_bdd_garbage, get_bdd_class, new_bdd, new_mdd
 from .dfi import DFIResult, dfi, dfi_ns
 from .fpj import FPJResult, fpj
 from .multistrategy import CycleKernel, ForcedMultiStrategyResult, PriorityChain, chain_multistrategy
+from .cq_multistrategy import (
+    CQMultiStrategyStages,
+    CQStrategySnapshot,
+    chain_quotient_multistrategy,
+    chain_quotient_multistrategy_stages,
+    trace_chain_quotient_solver,
+)
+from .cq_cached_multistrategy import (
+    IncrementalForcedWinCache,
+    cached_chain_quotient_multistrategy,
+    cached_chain_quotient_multistrategy_stages,
+)
+from .validation import (
+    LassoWitness,
+    MaximalityProgress,
+    MultiStrategyResult,
+    MultiStrategyValidationReport,
+    PlayerValidationReport,
+    VertexChoiceReport,
+    validate_multistrategy,
+)
 from .visualize import draw_game, draw_pg
 from .zielonka import ZielonkaResult, zielonka
 
@@ -43,7 +68,18 @@ __all__ = [
     "FPJResult",
     "ForcedMultiStrategyResult",
     "CycleKernel",
+    "CycleEnumerationLimitError",
+    "MultiStrategyLike",
     "PriorityChain",
+    "CQMultiStrategyStages",
+    "CQStrategySnapshot",
+    "IncrementalForcedWinCache",
+    "LassoWitness",
+    "MaximalityProgress",
+    "MultiStrategyResult",
+    "MultiStrategyValidationReport",
+    "PlayerValidationReport",
+    "VertexChoiceReport",
     "DFIResult",
     "BenchmarkRecord",
     "BenchmarkProgress",
@@ -55,12 +91,20 @@ __all__ = [
     "ParityCycle",
     "ForcedParityCycle",
     "enumerate_forced_winning_cycles",
+    "enumerate_multistrategy_cycles",
     "enumerate_unique_cycles",
+    "multistrategy_subgame",
     "StrategyProfile",
     "enumerate_strategy_profiles",
     "draw_game",
     "fpj",
     "chain_multistrategy",
+    "chain_quotient_multistrategy",
+    "chain_quotient_multistrategy_stages",
+    "cached_chain_quotient_multistrategy",
+    "cached_chain_quotient_multistrategy_stages",
+    "trace_chain_quotient_solver",
+    "validate_multistrategy",
     "dfi",
     "dfi_ns",
     "zielonka",

@@ -92,6 +92,19 @@ per-player quality metrics, per-vertex choices, counterexamples, and FPJ and
 Zielonka comparisons. Change `GAME_PATH` in the configuration cell to inspect
 any included `.pg` or `.oink` game.
 
+For CQ-MS, `chain_quotient_multistrategy_stages(game)` exposes both the
+conservative initial strategy and the maximized result. Pass either stage to
+`enumerate_multistrategy_cycles(game, stage, player)` to list every
+rotation-unique simple cycle permitted by that player's strategy and all
+opponent choices. Cycle enumeration is exponential in the worst case, so the
+API and validation notebook provide explicit size limits.
+
+`cached_chain_quotient_multistrategy(game)` is the incremental CQ-MS variant
+registered as `CQ-MS-Cached`. It replaces the per-candidate Zielonka solve with
+cached transitive closure in opponent-priority threshold subgraphs. Candidate
+edges are accepted exactly when they introduce no opponent-winning cycle; the
+closures are updated incrementally after every accepted edge.
+
 ## Flamegraph profiling
 
 Run `python scripts/profile_parity_games.py --game data/benchmarks/syntcomp2020-pgame/lilydemo03.tlsf.ehoa.oink` or `python scripts/profile_parity_games.py --game ltl2dba08` to profile selected games. Use `--dataset AMBA` to profile every game in a benchmark set. The default profiles all four methods sequentially and writes a standalone SVG flamegraph, raw `.prof` file, cumulative/self-time text report, and JSON summary for each game/method pair under `profiles/`. Open each SVG in a browser; the raw profiles can also be loaded with Python's `pstats` tools. Add `--memory` to record peak traced Python allocation for each run. This flag adds overhead and does not measure native allocations or produce a memory flamegraph.
