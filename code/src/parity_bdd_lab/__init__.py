@@ -39,6 +39,11 @@ from .cycles import (
 from .decision_diagrams import collect_bdd_garbage, get_bdd_class, new_bdd, new_mdd
 from .dfi import DFIResult, dfi, dfi_ns
 from .fpj import FPJResult, fpj
+from ._oink_common import OinkResult
+from .oink_fpi import oink_fpi
+from .oink_fpim import oink_fpim
+from .oink_fpj import oink_fpj
+from .oink_fpjm import oink_fpjm
 from .multistrategy import CycleKernel, ForcedMultiStrategyResult, PriorityChain, chain_multistrategy
 from .cq_multistrategy import (
     CQMultiStrategyStages,
@@ -66,6 +71,7 @@ from .zielonka import ZielonkaResult, zielonka
 
 __all__ = [
     "FPJResult",
+    "OinkResult",
     "ForcedMultiStrategyResult",
     "CycleKernel",
     "CycleEnumerationLimitError",
@@ -98,6 +104,10 @@ __all__ = [
     "enumerate_strategy_profiles",
     "draw_game",
     "fpj",
+    "oink_fpi",
+    "oink_fpim",
+    "oink_fpj",
+    "oink_fpjm",
     "chain_multistrategy",
     "chain_quotient_multistrategy",
     "chain_quotient_multistrategy_stages",
