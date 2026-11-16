@@ -5,6 +5,7 @@ Summary: Small parity games, exhaustive positional strategies, and BDD/MDD exper
 Requires-Python: >=3.11
 Description-Content-Type: text/markdown
 Requires-Dist: dd>=0.6.0
+Requires-Dist: numpy>=1.24
 Provides-Extra: notebooks
 Requires-Dist: jupyterlab>=4; extra == "notebooks"
 Requires-Dist: matplotlib>=3.8; extra == "notebooks"
@@ -30,7 +31,7 @@ python -m pip install -e '.[notebooks,test]'
 jupyter lab
 ```
 
-Open `notebooks/01_small_parity_games.ipynb`. The core dependency is `dd`; use `parity_bdd_lab.new_bdd()` for a BDD manager and `new_mdd({...})` for `dd.mdd.MDD`. The BDD backend defaults to `auto`: it selects `dd.cudd.BDD` when the optional Cython/CUDD extension is installed, otherwise it uses `dd.autoref.BDD`. Set `PARITY_BDD_BACKEND=python` or `PARITY_BDD_BACKEND=cudd` to select a backend explicitly.
+Open `notebooks/01_small_parity_games.ipynb`. The core dependencies are `dd` and NumPy; use `parity_bdd_lab.new_bdd()` for a BDD manager and `new_mdd({...})` for `dd.mdd.MDD`. The BDD backend defaults to `auto`: it selects `dd.cudd.BDD` when the optional Cython/CUDD extension is installed, otherwise it uses `dd.autoref.BDD`. Set `PARITY_BDD_BACKEND=python` or `PARITY_BDD_BACKEND=cudd` to select a backend explicitly.
 
 To build the optional CUDD backend in the active venv, follow the [`dd` installation instructions](https://github.com/tulip-control/dd#cython-bindings). On macOS, use:
 
@@ -77,7 +78,7 @@ For a tidy, fixed graph layout, pass a `{vertex: (x, y)}` mapping to `draw_game`
 
 ## Symbolic FPJM solver
 
-The `parity_bdd_lab.fpjm.fpjm(game)` function implements the symbolic FPJM fixpoint algorithm using the selected `dd` BDD backend for vertex sets and the edge relation. It returns an `FPJMResult` with Even/Odd winning regions, winning strategy edges, justification edges, iteration count, and live BDD node count. The encoding groups successor sets by source, constructs vertex sets from shared bit prefixes, and periodically asks `dd` to collect unreachable intermediate nodes; this matters on large sparse games such as `ltl2dba08`. DFI uses the same encoding and collection policy. See `notebooks/fpjm.ipynb` for runs on the included examples. The implementation follows Algorithm 2 in [Lijzenga and van Dijk, *Symbolic Parity Game Solvers that Yield Winning Strategies*](https://ris.utwente.nl/ws/portalfiles/portal/253278668/Lijzenga2020symbolic.pdf).
+The `parity_bdd_lab.fpjm.fpjm(game)` function implements symbolic FPJM using the selected `dd` BDD backend for vertex sets and the edge relation. It returns an `FPJMResult` with Even/Odd winning regions, winning multi-strategy edges, justification edges, iteration count, and live BDD node count. The encoding groups successor sets by source, constructs vertex sets from shared bit prefixes, and periodically asks `dd` to collect unreachable intermediate nodes; this matters on large sparse games such as `ltl2dba08`. DFI uses the same encoding and collection policy. See `notebooks/fpjm.ipynb` for runs on the included examples. The fixpoint procedure follows Algorithm 2 in [Lijzenga and van Dijk, *Symbolic Parity Game Solvers that Yield Winning Strategies*](https://ris.utwente.nl/ws/portalfiles/portal/253278668/Lijzenga2020symbolic.pdf), while retaining all applicable justification choices.
 
 ## Paper benchmark datasets
 
@@ -85,7 +86,7 @@ The paper's seven SYNTCOMP 2020 pgame benchmark sets are preserved in their orig
 
 ## Benchmarking solvers
 
-`parity_bdd_lab.benchmark` provides `benchmark_game(game, ...)`, `benchmark_dataset(name, ...)`, `benchmark_all_datasets(...)`, and `benchmark_selection(datasets, methods=...)`. The selection runner accepts one dataset, a list of datasets, or `None` for all seven, plus a subset of built-in methods. All dataset runners use four worker processes by default (`workers=4`); `workers=1` selects sequential execution. More workers can improve throughput while increasing peak memory. Built-in methods are symbolic `DFI`, `DFI-ns`, and `FPJM`, explicit `Zielonka`, and `Chain-MS`. Each record includes runtime, winning-region sizes, and a solution fingerprint; symbolic solvers also report diagram nodes. Python allocation tracing is optional and off by default because it can affect timing. Dataset runners report each completed solver run by default; progress callbacks are called in completion order, while returned records retain dataset order. Pass `progress=False` to silence updates or a callback to receive `BenchmarkProgress` events. Parallel custom solver functions must be picklable (normally, define them at module top level). Solver results and loaded games are released between runs, with cyclic garbage collected, so only compact result records accumulate. Use `records_to_dataframe()` for analysis or `write_benchmark_csv()` to save results.
+`parity_bdd_lab.benchmark` provides `benchmark_game(game, ...)`, `benchmark_dataset(name, ...)`, `benchmark_all_datasets(...)`, and `benchmark_selection(datasets, methods=...)`. The selection runner accepts one dataset, a list of datasets, or `None` for all seven, plus a subset of built-in methods. All dataset runners use four worker processes by default (`workers=4`); `workers=1` selects sequential execution. More workers can improve throughput while increasing peak memory. Built-in methods include symbolic `DFI`, `DFI-ns`, and `FPJM`, the four explicit Oink fixpoint ports, explicit `Zielonka`, and the multistrategy solvers. Each record includes runtime, winning-region sizes, and a solution fingerprint; symbolic solvers also report diagram nodes. Python allocation tracing is optional and off by default because it can affect timing. Dataset runners report each completed solver run by default; progress callbacks are called in completion order, while returned records retain dataset order. Pass `progress=False` to silence updates or a callback to receive `BenchmarkProgress` events. Parallel custom solver functions must be picklable (normally, define them at module top level). Solver results and loaded games are released between runs, with cyclic garbage collected, so only compact result records accumulate. Use `records_to_dataframe()` for analysis or `write_benchmark_csv()` to save results.
 
 ## Forced-winning multistrategies
 
@@ -108,6 +109,24 @@ Open `notebooks/validate_multistrategy.ipynb` for a detailed report with
 per-player quality metrics, per-vertex choices, counterexamples, and FPJM and
 Zielonka comparisons. Change `GAME_PATH` in the configuration cell to inspect
 any included `.pg` or `.oink` game.
+
+For CQ-MS, `chain_quotient_multistrategy_stages(game)` exposes both the
+conservative initial strategy and the maximized result. Pass either stage to
+`enumerate_multistrategy_cycles(game, stage, player)` to list every
+rotation-unique simple cycle permitted by that player's strategy and all
+opponent choices. Cycle enumeration is exponential in the worst case, so the
+API and validation notebook provide explicit size limits.
+
+`cached_chain_quotient_multistrategy(game)` is the incremental CQ-MS variant
+registered as `CQ-MS-Cached`. It replaces the per-candidate Zielonka solve with
+cached transitive closure in opponent-priority threshold subgraphs. Candidate
+edges are accepted exactly when they introduce no opponent-winning cycle; the
+closures are updated incrementally after every accepted edge.
+
+`q_cached_multistrategy(game)`, registered as `Q-MS-Cached`, applies the same
+cached maximisation directly to the original game. It skips chain contraction
+and stores vertex-to-vertex transitions in BDDs built directly from sorted
+interleaved endpoint codes.
 
 ## Flamegraph profiling
 

@@ -57,6 +57,7 @@ from .cq_cached_multistrategy import (
     cached_chain_quotient_multistrategy,
     cached_chain_quotient_multistrategy_stages,
 )
+from .q_cached_multistrategy import QCachedMultiStrategyResult, q_cached_multistrategy
 from .validation import (
     LassoWitness,
     MaximalityProgress,
@@ -80,6 +81,7 @@ __all__ = [
     "CQMultiStrategyStages",
     "CQStrategySnapshot",
     "IncrementalForcedWinCache",
+    "QCachedMultiStrategyResult",
     "LassoWitness",
     "MaximalityProgress",
     "MultiStrategyResult",
@@ -113,6 +115,7 @@ __all__ = [
     "chain_quotient_multistrategy_stages",
     "cached_chain_quotient_multistrategy",
     "cached_chain_quotient_multistrategy_stages",
+    "q_cached_multistrategy",
     "trace_chain_quotient_solver",
     "validate_multistrategy",
     "dfi",

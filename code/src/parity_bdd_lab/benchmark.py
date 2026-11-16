@@ -27,6 +27,7 @@ from .oink_fpjm import oink_fpjm
 from .multistrategy import chain_multistrategy
 from .cq_multistrategy import chain_quotient_multistrategy
 from .cq_cached_multistrategy import cached_chain_quotient_multistrategy
+from .q_cached_multistrategy import q_cached_multistrategy
 from .zielonka import zielonka
 
 Solver = Callable[[ParityGame], object]
@@ -42,6 +43,7 @@ DEFAULT_METHODS: dict[str, Solver] = {
     "Zielonka": zielonka,
     "CQ-MS": chain_quotient_multistrategy,
     "CQ-MS-Cached": cached_chain_quotient_multistrategy,
+    "Q-MS-Cached": q_cached_multistrategy,
 }
 
 

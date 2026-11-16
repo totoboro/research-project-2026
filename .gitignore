@@ -9,3 +9,8 @@ __pycache__/
 *.out
 *.synctex.gz
 *.pdf
+
+# Independently versioned upstream tool repositories
+oink/
+knor/
+sylvan/

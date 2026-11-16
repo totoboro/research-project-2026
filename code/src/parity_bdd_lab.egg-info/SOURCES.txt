@@ -1,7 +1,10 @@
 README.md
 pyproject.toml
 src/parity_bdd_lab/__init__.py
+src/parity_bdd_lab/_oink_common.py
 src/parity_bdd_lab/benchmark.py
+src/parity_bdd_lab/cq_cached_multistrategy.py
+src/parity_bdd_lab/cq_multistrategy.py
 src/parity_bdd_lab/cycles.py
 src/parity_bdd_lab/datasets.py
 src/parity_bdd_lab/decision_diagrams.py
@@ -10,7 +13,12 @@ src/parity_bdd_lab/examples.py
 src/parity_bdd_lab/fpjm.py
 src/parity_bdd_lab/game.py
 src/parity_bdd_lab/multistrategy.py
+src/parity_bdd_lab/oink_fpi.py
+src/parity_bdd_lab/oink_fpim.py
+src/parity_bdd_lab/oink_fpj.py
+src/parity_bdd_lab/oink_fpjm.py
 src/parity_bdd_lab/profiling.py
+src/parity_bdd_lab/q_cached_multistrategy.py
 src/parity_bdd_lab/validation.py
 src/parity_bdd_lab/visualize.py
 src/parity_bdd_lab/zielonka.py
@@ -19,5 +27,9 @@ src/parity_bdd_lab.egg-info/SOURCES.txt
 src/parity_bdd_lab.egg-info/dependency_links.txt
 src/parity_bdd_lab.egg-info/requires.txt
 src/parity_bdd_lab.egg-info/top_level.txt
+tests/test_cq_cached_multistrategy.py
+tests/test_cq_multistrategy.py
+tests/test_oink_solvers.py
+tests/test_q_cached_multistrategy.py
 tests/test_validation.py
 tests/test_visualize.py

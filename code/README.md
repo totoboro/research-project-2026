@@ -13,7 +13,7 @@ python -m pip install -e '.[notebooks,test]'
 jupyter lab
 ```
 
-Open `notebooks/01_small_parity_games.ipynb`. The core dependency is `dd`; use `parity_bdd_lab.new_bdd()` for a BDD manager and `new_mdd({...})` for `dd.mdd.MDD`. The BDD backend defaults to `auto`: it selects `dd.cudd.BDD` when the optional Cython/CUDD extension is installed, otherwise it uses `dd.autoref.BDD`. Set `PARITY_BDD_BACKEND=python` or `PARITY_BDD_BACKEND=cudd` to select a backend explicitly.
+Open `notebooks/01_small_parity_games.ipynb`. The core dependencies are `dd` and NumPy; use `parity_bdd_lab.new_bdd()` for a BDD manager and `new_mdd({...})` for `dd.mdd.MDD`. The BDD backend defaults to `auto`: it selects `dd.cudd.BDD` when the optional Cython/CUDD extension is installed, otherwise it uses `dd.autoref.BDD`. Set `PARITY_BDD_BACKEND=python` or `PARITY_BDD_BACKEND=cudd` to select a backend explicitly.
 
 To build the optional CUDD backend in the active venv, follow the [`dd` installation instructions](https://github.com/tulip-control/dd#cython-bindings). On macOS, use:
 
@@ -104,6 +104,11 @@ registered as `CQ-MS-Cached`. It replaces the per-candidate Zielonka solve with
 cached transitive closure in opponent-priority threshold subgraphs. Candidate
 edges are accepted exactly when they introduce no opponent-winning cycle; the
 closures are updated incrementally after every accepted edge.
+
+`q_cached_multistrategy(game)`, registered as `Q-MS-Cached`, applies the same
+cached maximisation directly to the original game. It skips chain contraction
+and stores vertex-to-vertex transitions in BDDs built directly from sorted
+interleaved endpoint codes.
 
 ## Flamegraph profiling
 
