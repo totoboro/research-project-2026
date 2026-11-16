@@ -20,6 +20,10 @@ from .datasets import benchmark_dataset_names, iter_benchmark_files
 from .dfi import dfi, dfi_ns
 from .fpj import fpj
 from .game import ParityGame, read_pg
+from .oink_fpi import oink_fpi
+from .oink_fpim import oink_fpim
+from .oink_fpj import oink_fpj
+from .oink_fpjm import oink_fpjm
 from .multistrategy import chain_multistrategy
 from .cq_multistrategy import chain_quotient_multistrategy
 from .cq_cached_multistrategy import cached_chain_quotient_multistrategy
@@ -30,6 +34,10 @@ DEFAULT_METHODS: dict[str, Solver] = {
     "DFI": dfi,
     "DFI-ns": dfi_ns,
     "FPJ": fpj,
+    "Oink-FPI": oink_fpi,
+    "Oink-FPIM": oink_fpim,
+    "Oink-FPJ": oink_fpj,
+    "Oink-FPJM": oink_fpjm,
     "Chain-MS": chain_multistrategy,
     "Zielonka": zielonka,
     "CQ-MS": chain_quotient_multistrategy,

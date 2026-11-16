@@ -7,6 +7,7 @@ import pytest
 
 from parity_bdd_lab import (
     ParityGame,
+    benchmark_game,
     oink_fpi,
     oink_fpim,
     oink_fpj,
@@ -85,3 +86,13 @@ def test_multi_strategy_variants_retain_all_immediate_winning_moves() -> None:
     assert oink_fpjm(game).even_strategy >= expected
     assert len(oink_fpi(game).even_strategy & expected) == 1
     assert len(oink_fpj(game).even_strategy & expected) == 1
+
+
+def test_oink_solvers_are_available_as_built_in_benchmarks() -> None:
+    game = ParityGame(owner={0: 0}, priority={0: 0}, successors={0: (0,)})
+    methods = ("Oink-FPI", "Oink-FPIM", "Oink-FPJ", "Oink-FPJM")
+
+    records = benchmark_game(game, methods=methods, workers=1)
+
+    assert tuple(record.method for record in records) == methods
+    assert len({record.solution_fingerprint for record in records}) == 1
