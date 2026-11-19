@@ -1,0 +1,227 @@
+\documentclass[11pt, a4paper]{article}
+
+% Essential Packages
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath, amssymb, graphicx}
+\usepackage{tabularx, booktabs}
+\usepackage{hyperref}
+
+% We can solve parity game using algorithms that use BDDs, in earlier years we did this with fixpoint algorithms already. However these algorithms are quite vulnerable to particular parity games. Goal of the project is to study different symbolic versions of parity game algorithms, that are more robust, such as tangle learning, tangle attractors, fixpoints with justification, and possibly quasi-polynomial algorithms.
+
+%It is relatively straight forward to start with justification fixpoints and see how far we can go. We have "fixpoints with freezing", and I think the next targets would be "fixpoints with justification" and "priority promotion".
+
+\title{A symbolic approach to TL}
+\author{Thomas van de Weerd \\ \small University of Twente}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+A parity game is a useful way to describe synthesis problems. To actually solve the synthesis problem, we want to solve the parity game.
+There are many different algorithms to solve parity games. Fix-point based algorithms form a big part of this, like DFI and FPJ. 
+Other types of algorithms include strategy improvement, progress measures, separating automata, priority promotion and tangle learning.
+This research will focus on tangle learning and the different ways we can implement it. 
+Algorithms can be implemented both explicitly and symbolically. 
+There already exist explicit implementations of tangle learning. In this paper, we will analyse those implementations and create a symbolic implementation from that analysis.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+Parity games are finite directed graphs with priority values. During a parity
+In a parity game, we have player 0 and player 1, which are also often called the controller and the environment.
+This controller and environment naming stems from the fact that we can use a parity game to describe a synthesis problem.
+To play the parity game, we start at an initial node, from which we move a token along its edges. The player that chooses which edge we move along is the owner of the current vertex.
+Eventually we reach an infinitely repeating sequence of plays. The winner is determined by the highest priority of each node that occurs an infinite amount of time.
+<explain more about how parity games work, e.g. win conditions, an example game, and about strategies>
+
+
+<explain about automata and mu calculus>
+
+
+<explain what a tangle is>
+
+
+<walkthrough to what the tangle learning algorithm does>
+
+
+<explain the difference between explicit and symbolic algorithms>
+
+
+<explain why a symbolic algorithm can be useful, e.g. state space can be much smaller meaning we need less memory when we have a game with many vertices/edges>
+
+
+
+\section{Related work}
+\label{sec:relwork}
+
+<symbolic algorithm for FPJ (Oebele), we can use this to analyse how a symbolic algorithm looks like compared to the explicit version>
+<tangle learning algorithm (Tom van Dijk)>
+<Antonio Di Stasio, Aniello Murano and Moshe Y. Vardi >
+
+<Research gap compared to Solving Parity Games: Explicit vs Symbolic, is that we are using tangle learning, and attempting to get multiple symbolic implementations.>
+
+\section{Research Questions and Objectives}
+\label{sec:objectives}
+\begin{itemize}
+    % Dit is te informeel, we moeten formeler maken. 
+    % Preliminary investigation gave two ways we can. 
+    % Wat als het niet lukt. Mogelijk stappenplan weten te krijgen. Kunnen uitleggen hoe je dit toch wel kan bereiken. Wat is er fout gegaan en/of waarom heeft deze methode niet gewerkt.
+
+    \item \textbf{Primary Question:} How do we come up with an efficient symbolic implementation of the tangle learning algorithm.
+    \item \textbf{Objective 1:} Come up with atleast one symbolic version of the tangle learning algorithm
+    \item \textbf{Objective 2:} Investigate how different symbolic implementations can differ in performance.
+\end{itemize}
+
+\section{Proposed Methodology}
+\label{sec:methodology}
+There are a number of different steps for doing this research.
+% Dit eerste stuk is onderdeel van de research proposal, dus kunnen we weglaten in de methodology.
+Firstly we will do a literature analysis on existing methods and algorithms.
+Secondly we will come up with methods to derive symbolic algorithms for tangle learning.
+
+Thirdly the derived symbolic algorithms will be compared in time and space complexity.
+
+% Hoe gaan we benchmarks doen?
+% Wat is success? van de kennisvraag en objectives.
+
+For testing and implementation we will make use of the sylvan and knor libraries. For comparison with explicit algorithms we can also introduce oink.
+
+\section{Expected Timeline}
+\label{sec:timeline}
+\begin{table}[htbp]
+    \centering
+    \caption{Research Project Planning}
+    \label{tab:research_planning}
+    \begin{tabularx}{\textwidth}{l X}
+        \toprule
+        \textbf{Deadline} & \textbf{Task/Deliverable} \\
+        \midrule
+        Nov 27 & Literature research on tangle learning \\
+        % Analysis is vaag. Understanding beter. 
+        % Redelijk idee van hoe we dit gaan aanpakken.
+        % Hoe gaan we tangle represetneren in BDD. En hoe werkt de tangle attractor dan.
+        % Per tangle die we leren maken we een BDD aan. Welke knopen zouden escape zijn.
+        % Strategy bijhouden in BDD.
+        % Design fase, voor hoe gaan we symbolisch algoritmes maken.
+        Dec 04 & Analysis of tangle learning \\
+        Dec 11 & Describe method to get symbolic algorithm \\
+        Dec 18 & Analysis of symbolic algorithm \\
+        Jan 03 &  \\
+        Jan 10 & Answer Main Research Question \\
+        Jan 17 & Draft Paper submission \\
+        Jan 24 & Final paper submission \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Significance and Impact}
+\label{sec:impact}
+Explain how your findings will contribute to academic knowledge or practical applications.
+
+\begin{thebibliography}{9}
+\bibitem{Lapauw2020}
+R. Lapauw, M. Bruynooghe, and M. Denecker,
+``Improving Parity Game Solvers with Justifications,''
+in \textit{Verification, Model Checking, and Abstract Interpretation
+(VMCAI 2020)},
+D. Beyer and D. Zufferey, Eds.,
+Lecture Notes in Computer Science, vol. 11990.
+Springer, Cham, 2020.
+doi: \href{https://doi.org/10.1007/978-3-030-39322-9_21}
+{10.1007/978-3-030-39322-9\_21}.
+
+\bibitem{vanDijk2019}
+T. van Dijk,
+``A Parity Game Tale of Two Counters,''
+\textit{Electronic Proceedings in Theoretical Computer Science},
+vol. 305, pp. 107--122, 2019.
+doi: \href{https://doi.org/10.4204/EPTCS.305.8}
+{10.4204/EPTCS.305.8}.
+
+\bibitem{vanDijk2018}
+T. van Dijk,
+``Attracting Tangles to Solve Parity Games,''
+in \textit{Computer Aided Verification (CAV 2018)},
+H. Chockler and G. Weissenbacher, Eds.,
+Lecture Notes in Computer Science, vol. 10982.
+Springer, Cham, 2018.
+doi: \href{https://doi.org/10.1007/978-3-319-96142-2_14}
+{10.1007/978-3-319-96142-2\_14}.
+
+\bibitem{Neele2022}
+T. Neele, T. A. C. Willemse, W. Wesselink, et al.,
+``Partial-order reduction for parity games and parameterised Boolean equation systems,''
+\textit{International Journal on Software Tools for Technology Transfer},
+vol. 24, pp. 735--756, 2022.
+doi: \href{https://doi.org/10.1007/s10009-022-00672-0}
+{10.1007/s10009-022-00672-0}.
+
+\bibitem{Neele2020}
+T. Neele, T. A. C. Willemse, and W. Wesselink,
+``Partial-Order Reduction for Parity Games with an Application on Parameterised Boolean Equation Systems,''
+in \textit{Tools and Algorithms for the Construction and Analysis of Systems (TACAS 2020)},
+A. Biere and D. Parker, Eds.,
+Lecture Notes in Computer Science, vol. 12079.
+Springer, Cham, 2020.
+doi: \href{https://doi.org/10.1007/978-3-030-45237-7_19}
+{10.1007/978-3-030-45237-7\_19}.
+
+\bibitem{Laveaux2022}
+M. Laveaux, W. Wesselink, and T. A. C. Willemse,
+``On-The-Fly Solving for Symbolic Parity Games,''
+in \textit{Tools and Algorithms for the Construction and Analysis of Systems (TACAS 2022)},
+D. Fisman and G. Rosu, Eds.,
+Lecture Notes in Computer Science, vol. 13244.
+Springer, Cham, 2022.
+doi: \href{https://doi.org/10.1007/978-3-030-99527-0_8}
+{10.1007/978-3-030-99527-0\_8}.
+
+\bibitem{Cranen2018}
+S. Cranen, J. J. A. Keiren, and T. A. C. Willemse,
+``Parity game reductions,''
+\textit{Acta Informatica},
+vol. 55, pp. 401--444, 2018.
+doi: \href{https://doi.org/10.1007/s00236-017-0301-x}
+{10.1007/s00236-017-0301-x}.
+
+\bibitem{vanDijk2024}
+T. van Dijk,
+``Avoiding Distractions in Parity Games,''
+in \textit{ISoLA 2024},
+Lecture Notes in Computer Science, vol. 15221,
+pp. 330--352.
+Springer, 2024.
+doi: \href{https://doi.org/10.1007/978-3-031-75380-0_19}
+{10.1007/978-3-031-75380-0\_19}.
+
+\bibitem{Chatterjee2017}
+K. Chatterjee, W. Dvo\v{r}\'ak, M. Henzinger, and V. Loitzenbauer,
+``Improved Set-based Symbolic Algorithms for Parity Games,''
+arXiv preprint arXiv:1706.04889, 2017.
+Available: \url{https://arxiv.org/abs/1706.04889}.
+
+\bibitem{Chatterjee2018}
+K. Chatterjee, W. Dvo\v{r}\'ak, M. Henzinger, and A. Svozil,
+``Quasipolynomial Set-Based Symbolic Algorithms for Parity Games,''
+in \textit{EPiC Series in Computing},
+vol. 57.
+EasyChair, 2018.
+doi: \href{https://doi.org/10.29007/5z5k}
+{10.29007/5z5k}.
+
+\bibitem{DiStasio2018}
+A. Di Stasio, A. Murano, and M. Y. Vardi,
+``Solving Parity Games: Explicit vs Symbolic,''
+in \textit{Implementation and Application of Automata (CIAA 2018)},
+C. C\^{a}mpeanu, Ed.,
+Lecture Notes in Computer Science, vol. 10977.
+Springer, Cham, 2018.
+doi: \href{https://doi.org/10.1007/978-3-319-94812-6_14}
+{10.1007/978-3-319-94812-6\_14}.
+\end{thebibliography}
+
+\end{document}

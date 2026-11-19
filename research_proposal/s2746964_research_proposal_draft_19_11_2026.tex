@@ -31,10 +31,11 @@ There already exist explicit implementations of tangle learning. In this paper, 
 
 \section{Introduction}
 \label{sec:intro}
-Parity games are finite directed graphs with priority values. 
+Parity games are finite directed graphs with priority values. During a parity
 In a parity game, we have player 0 and player 1, which are also often called the controller and the environment.
 This controller and environment naming stems from the fact that we can use a parity game to describe a synthesis problem.
-
+To play the parity game, we start at an initial node, from which we move a token along its edges. The player that chooses which edge we move along is the owner of the current vertex.
+Eventually we reach an infinitely repeating sequence of plays. The winner is determined by the highest priority of each node that occurs an infinite amount of time.
 <explain more about how parity games work, e.g. win conditions, an example game, and about strategies>
 
 
@@ -66,6 +67,10 @@ This controller and environment naming stems from the fact that we can use a par
 \section{Research Questions and Objectives}
 \label{sec:objectives}
 \begin{itemize}
+    % Dit is te informeel, we moeten formeler maken. 
+    % Preliminary investigation gave two ways we can. 
+    % Wat als het niet lukt. Mogelijk stappenplan weten te krijgen. Kunnen uitleggen hoe je dit toch wel kan bereiken. Wat is er fout gegaan en/of waarom heeft deze methode niet gewerkt.
+
     \item \textbf{Primary Question:} How do we come up with an efficient symbolic implementation of the tangle learning algorithm.
     \item \textbf{Objective 1:} Come up with atleast one symbolic version of the tangle learning algorithm
     \item \textbf{Objective 2:} Investigate how different symbolic implementations can differ in performance.
@@ -74,9 +79,14 @@ This controller and environment naming stems from the fact that we can use a par
 \section{Proposed Methodology}
 \label{sec:methodology}
 There are a number of different steps for doing this research.
+% Dit eerste stuk is onderdeel van de research proposal, dus kunnen we weglaten in de methodology.
 Firstly we will do a literature analysis on existing methods and algorithms.
 Secondly we will come up with methods to derive symbolic algorithms for tangle learning.
+
 Thirdly the derived symbolic algorithms will be compared in time and space complexity.
+
+% Hoe gaan we benchmarks doen?
+% Wat is success? van de kennisvraag en objectives.
 
 For testing and implementation we will make use of the sylvan and knor libraries. For comparison with explicit algorithms we can also introduce oink.
 
@@ -91,6 +101,12 @@ For testing and implementation we will make use of the sylvan and knor libraries
         \textbf{Deadline} & \textbf{Task/Deliverable} \\
         \midrule
         Nov 27 & Literature research on tangle learning \\
+        % Analysis is vaag. Understanding beter. 
+        % Redelijk idee van hoe we dit gaan aanpakken.
+        % Hoe gaan we tangle represetneren in BDD. En hoe werkt de tangle attractor dan.
+        % Per tangle die we leren maken we een BDD aan. Welke knopen zouden escape zijn.
+        % Strategy bijhouden in BDD.
+        % Design fase, voor hoe gaan we symbolisch algoritmes maken.
         Dec 04 & Analysis of tangle learning \\
         Dec 11 & Describe method to get symbolic algorithm \\
         Dec 18 & Analysis of symbolic algorithm \\
