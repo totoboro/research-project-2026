@@ -5,53 +5,59 @@ The style file: ACM-Reference-Format.bst
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
-Database file #1: sample-base.bib
+Database file #1: references.bib
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
 Reallocated global_strs (elt_size=200001) to 20 items from 10.
 Reallocated glb_str_end (elt_size=4) to 20 items from 10.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-Warning--empty publisher in clark:pct
-Warning--empty address in clark:pct
-You've used 6 entries,
+Warning--empty address in Chatterjee2018
+Warning--page numbers missing in both pages and numpages fields in Chatterjee2018
+Warning--page numbers missing in both pages and numpages fields in DiStasio2018
+Warning--page numbers missing in both pages and numpages fields in Lapauw2020
+Warning--page numbers missing in both pages and numpages fields in Laveaux2022
+Warning--page numbers missing in both pages and numpages fields in Neele2020
+Warning--page numbers missing in both pages and numpages fields in vanDijk2018
+Warning--empty address in vanDijk2024
+You've used 11 entries,
             5981 wiz_defined-function locations,
-            1663 strings with 20619 characters,
-and the built_in function-call counts, 6229 in all, are:
-= -- 856
-> -- 130
+            1574 strings with 20687 characters,
+and the built_in function-call counts, 12093 in all, are:
+= -- 1467
+> -- 359
 < -- 0
-+ -- 39
-- -- 51
-* -- 375
-:= -- 581
-add.period$ -- 32
-call.type$ -- 6
-change.case$ -- 33
-chr.to.int$ -- 6
-cite$ -- 8
-duplicate$ -- 577
-empty$ -- 406
-format.name$ -- 59
-if$ -- 1554
++ -- 112
+- -- 111
+* -- 894
+:= -- 1138
+add.period$ -- 55
+call.type$ -- 11
+change.case$ -- 74
+chr.to.int$ -- 11
+cite$ -- 19
+duplicate$ -- 1121
+empty$ -- 793
+format.name$ -- 143
+if$ -- 2899
 int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 21
-newline$ -- 93
-num.names$ -- 42
-pop$ -- 202
+missing$ -- 47
+newline$ -- 156
+num.names$ -- 87
+pop$ -- 427
 preamble$ -- 1
-purify$ -- 81
+purify$ -- 161
 quote$ -- 0
-skip$ -- 205
+skip$ -- 404
 stack$ -- 0
-substring$ -- 490
-swap$ -- 61
+substring$ -- 854
+swap$ -- 95
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 108
-warning$ -- 2
-while$ -- 46
+type$ -- 288
+warning$ -- 8
+while$ -- 62
 width$ -- 0
-write$ -- 161
-(There were 2 warnings)
+write$ -- 293
+(There were 8 warnings)

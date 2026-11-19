@@ -64,12 +64,12 @@
 %% complete the rights form.
 
 \setcopyright{acmcopyright}
-\copyrightyear{2022}
-\acmYear{2022}
+\copyrightyear{2026}
+\acmYear{2026}
 
 %% These commands are for a PROCEEDINGS abstract or paper.
-\acmConference[TScIT 37]{37$^{th}$ Twente Student Conference on IT}{July 8,
-  2022}{Enschede, The Netherlands}
+\acmConference[TScIT 46]{46$^{th}$ Twente Student Conference on IT}{January 29,
+  2027}{Enschede, The Netherlands}
 %
 %  Uncomment \acmBooktitle if th title of the proceedings is different
 %  from ``Proceedings of ...''!
@@ -119,7 +119,7 @@
 %%
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
-\title{Bachelor's Student Conference Proceedings Paper in LaTeX Template}
+\title{Symbolic approach for tangle learning}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -128,8 +128,8 @@
 %% "authornote" and "authornotemark" commands
 %% used to denote shared contribution to the research.
 
-\author{Author}
-\email{author@student.utwente.nl}
+\author{Thomas van de Weerd}
+\email{t.d.vandeweerd@student.utwente.nl}
 \affiliation{%
   \institution{University of Twente}
   \streetaddress{P.O. Box 217}
@@ -334,9 +334,7 @@ they mark the beginning and end of the text that is to be in the
 different typeface.
 
 You can use whatever symbols, accented characters, or non-English
-characters you need anywhere in your document; you can find a
-complete list of what is available in the \textit{\LaTeX\ User's
-Guide}\cite{Lamport:LaTeX}.
+characters you need anywhere in your document.
 
 \subsection{Math Equations}
 You may want to display math equations in three distinct styles:
@@ -349,7 +347,7 @@ in-text formula.  It is produced by the \textbf{math} environment,
 which can be invoked with the usual \texttt{{\char'134}begin. .
 .{\char'134}end} construction or with the short form \texttt{\$. .
 .\$}. You can use any of the symbols and structures, from $\alpha$
-to $\omega$, available in \LaTeX\cite{Lamport:LaTeX}; this section
+to $\omega$, available in \LaTeX; this section
 will simply show a few examples of in-text equations in context.
 Notice how this equation: \begin{math}\lim_{n\rightarrow
 \infty}x=0\end{math}, set here in in-line math style, looks
@@ -373,31 +371,6 @@ equation:
 and follow it with another numbered equation:
 \begin{equation}\sum_{i=0}^{\infty}x_i=\int_{0}^{\pi+2} f\end{equation}
 just to demonstrate \LaTeX's able handling of numbering.
-
-\subsection{Citations}
-Citations to articles \cite{bowman:reasoning, clark:pct,
-braams:babel, herlihy:methodology}, conference proceedings
-\cite{clark:pct} or books \cite{salas:calculus, Lamport:LaTeX}
-listed in the Bibliography section of your article will occur
-throughout the text of your article. You should use BibTeX to
-automatically produce this bibliography; you simply need to insert
-one of several citation commands with a key of the item cited in
-the proper location in the \texttt{.tex} file
-\cite{Lamport:LaTeX}. The key is a short reference you invent to
-uniquely identify each work; in this sample document, the key is
-the first author's surname and a word from the title.  This
-identifying key is included with each item in the \texttt{.bib}
-file for your article.
-
-The details of the construction of the \texttt{.bib} file are
-beyond the scope of this sample document, but more information can
-be found in the \textit{Author's Guide}, and exhaustive details in
-the \textit{\LaTeX\ User's Guide}\cite{Lamport:LaTeX}.
-
-This article shows only the plainest form of the citation command,
-using \texttt{{\char'134}cite}. This is what is stipulated in the
-SIGS style specifications. No other citation format is endorsed or
-supported.
 
 \subsection{Tables}
 Because tables cannot be split across pages, the best placement
@@ -539,7 +512,7 @@ different creation commands are in the \textit{Author's Guide};
 please consult it for more detailed instructions.  If you need to
 use another construct, not listed therein, which you want to have
 the same formatting as the Theorem or the
-Definition\cite{salas:calculus} shown above, use the
+Definition shown above, use the
 \texttt{{\char'134}newtheorem} or the \texttt{{\char'134}newdef}
 command, respectively, to create it.
 
@@ -557,11 +530,7 @@ problematic.
 \section{Conclusions}
 This paragraph will end the body of this sample document. Remember
 that you might still have Acknowledgments or Appendices; brief
-samples of these follow.  There is still the Bibliography to deal
-with; and we will make a disclaimer about that here: with the
-exception of the reference to the \LaTeX\ book, the citations in
-this paper are to articles which have nothing to do with the
-present subject and are used as examples only.
+samples of these follow.
 
 
 
@@ -583,7 +552,8 @@ describes.
 %% The next two lines define the bibliography style to be used, and
 %% the bibliography file.
 \bibliographystyle{ACM-Reference-Format}
-\bibliography{sample-base}
+\nocite{*}
+\bibliography{references}
 
 %%
 %% If your work has an appendix, this is the place to put it.
