@@ -1,0 +1,93 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{6}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{}, \showDOI{}, and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showDOI}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showDOI #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showDOI      \undefined \def \showDOI       #1{#1}\fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[Bowman et~al\mbox{.}(1993)]%
+        {bowman:reasoning}
+\bibfield{author}{\bibinfo{person}{Mic Bowman}, \bibinfo{person}{Saumya~K. Debray}, {and} \bibinfo{person}{Larry~L. Peterson}.} \bibinfo{year}{1993}\natexlab{}.
+\newblock \showarticletitle{Reasoning About Naming Systems}.
+\newblock \bibinfo{journal}{\emph{ACM Trans. Program. Lang. Syst.}} \bibinfo{volume}{15}, \bibinfo{number}{5} (\bibinfo{date}{November} \bibinfo{year}{1993}), \bibinfo{pages}{795--825}.
+\newblock
+\urldef\tempurl%
+\url{https://doi.org/10.1145/161468.161471}
+\showDOI{\tempurl}
+
+
+\bibitem[Braams(1991)]%
+        {braams:babel}
+\bibfield{author}{\bibinfo{person}{Johannes Braams}.} \bibinfo{year}{1991}\natexlab{}.
+\newblock \showarticletitle{Babel, a Multilingual Style-Option System for Use with LaTeX's Standard Document Styles}.
+\newblock \bibinfo{journal}{\emph{TUGboat}} \bibinfo{volume}{12}, \bibinfo{number}{2} (\bibinfo{date}{June} \bibinfo{year}{1991}), \bibinfo{pages}{291--301}.
+\newblock
+
+
+\bibitem[Clark(1991)]%
+        {clark:pct}
+\bibfield{author}{\bibinfo{person}{Malcolm Clark}.} \bibinfo{year}{1991}\natexlab{}.
+\newblock \showarticletitle{Post Congress Tristesse}. In \bibinfo{booktitle}{\emph{TeX90 Conference Proceedings}}. TeX Users Group, \bibinfo{pages}{84--89}.
+\newblock
+
+
+\bibitem[Herlihy(1993)]%
+        {herlihy:methodology}
+\bibfield{author}{\bibinfo{person}{Maurice Herlihy}.} \bibinfo{year}{1993}\natexlab{}.
+\newblock \showarticletitle{A Methodology for Implementing Highly Concurrent Data Objects}.
+\newblock \bibinfo{journal}{\emph{ACM Trans. Program. Lang. Syst.}} \bibinfo{volume}{15}, \bibinfo{number}{5} (\bibinfo{date}{November} \bibinfo{year}{1993}), \bibinfo{pages}{745--770}.
+\newblock
+\urldef\tempurl%
+\url{https://doi.org/10.1145/161468.161469}
+\showDOI{\tempurl}
+
+
+\bibitem[Lamport(1986)]%
+        {Lamport:LaTeX}
+\bibfield{author}{\bibinfo{person}{Leslie Lamport}.} \bibinfo{year}{1986}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{\it {\LaTeX}: A Document Preparation System}}.
+\newblock \bibinfo{publisher}{Addison-Wesley}, \bibinfo{address}{Reading, MA.}
+\newblock
+
+
+\bibitem[Salas and Hille(1978)]%
+        {salas:calculus}
+\bibfield{author}{\bibinfo{person}{S.L. Salas} {and} \bibinfo{person}{Einar Hille}.} \bibinfo{year}{1978}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Calculus: One and Several Variable}}.
+\newblock \bibinfo{publisher}{John Wiley and Sons}, \bibinfo{address}{New York}.
+\newblock
+
+
+\end{thebibliography}
